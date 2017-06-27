@@ -39,3 +39,27 @@
         name: "{{ item }}"
         state: present
       with_items: "{{ packages }}"
+    - name: install atom
+      apt:
+        deb: https://atom.io/download/deb
+        state: present
+    - name: install git prompt
+      become: no
+      git:
+        repo: https://github.com/magicmonty/bash-git-prompt.git
+        dest: ~/.bash-git-prompt
+    - name: set bash prompt
+      become: no
+      lineinfile:
+        path: ~/.bashrc
+        line: "source ~/.bash-git-prompt/gitprompt.sh"
+    - name: sudo with no password
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%sudo\s'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+    - name: set vim as default editor
+      alternatives:
+        name: editor
+        path: /usr/bin/vim.nox
