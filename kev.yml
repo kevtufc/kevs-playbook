@@ -1,0 +1,41 @@
+---
+- hosts: localhost
+  become: yes
+  become_method: sudo
+  vars:
+    keys_by_url:
+      - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    keys_by_id:
+      - server: hkp://keyserver.ubuntu.com:80
+        id: BBEBDCB318AD50EC6865090613B00F1FD2C19886
+    repos:
+      - deb http://repository.spotify.com stable non-free
+      - deb https://deb.nodesource.com/node_8.x {{ ansible_distribution_release }} main
+    packages:
+      - vim-nox
+      - git
+      - spotify-client
+      - nodejs
+      - chromium-browser
+  tasks:
+    - name: install keys (by url)
+      apt_key:
+        url: "{{ item }}"
+        state: present
+      with_items: "{{ keys_by_url }}"
+    - name: install keys (by id)
+      apt_key:
+        keyserver: "{{ item.server }}"
+        id: "{{ item.id }}"
+        state: present
+      with_items: "{{ keys_by_id }}"
+    - name: set up repos
+      apt_repository:
+        repo: "{{ item }}"
+        state: present
+      with_items: "{{ repos }}"
+    - name: install packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ packages }}"
