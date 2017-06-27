@@ -17,6 +17,10 @@
       - spotify-client
       - nodejs
       - chromium-browser
+    atom_packages:
+      - minimap
+      - pigments
+      - minimap-pigments
   tasks:
     - name: install keys (by url)
       apt_key:
@@ -43,6 +47,15 @@
       apt:
         deb: https://atom.io/download/deb
         state: present
+    - name: install atom packages
+      shell: >
+        apm list --bare | grep -E '^{{ item }}@'
+        && echo 'Already installed.'
+        || apm install '{{ item }}'
+      with_items: "{{ atom_packages }}"
+      register: apm_result
+      changed_when: "'Already installed.' not in apm_result.stdout"
+      become: no
     - name: install git prompt
       become: no
       git:
@@ -63,3 +76,7 @@
       alternatives:
         name: editor
         path: /usr/bin/vim.nox
+    - name: set vim settings
+      copy:
+        src: vimrc.local
+        dest: /etc/vimrc.local
