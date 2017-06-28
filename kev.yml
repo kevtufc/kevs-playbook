@@ -17,6 +17,7 @@
       - spotify-client
       - nodejs
       - chromium-browser
+      - sshfs
     atom_packages:
       - minimap
       - pigments
