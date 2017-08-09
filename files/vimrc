@@ -1,16 +1,15 @@
-if has("syntax")
-  syntax on
-endif
+call pathogen#infect()
+syntax on
 
 set background=dark
 
-if has("autocmd")
-  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-  filetype plugin indent on
-endif
+au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+filetype plugin indent on
 
 set showcmd		" Show (partial) command in status line.
 set showmatch		" Show matching brackets.
 set smartcase		" Do smart case matching
 set incsearch		" Incremental search
+set expandtab
+set ts=2
 "set mouse=a		" Enable mouse usage (all modes)
