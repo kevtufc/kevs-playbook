@@ -29,6 +29,16 @@
       - minimap
       - pigments
       - minimap-pigments
+      - atom-elixir
+      - cucumber
+      - fonts
+      - language-ansible
+      - language-slim
+      - linter-rubocop
+      - minimap-git-diff
+      - minimap-split-diff
+      - split-diff
+      - status-bar-blame
   tasks:
     - name: install keys (by url)
       apt_key:
@@ -55,6 +65,7 @@
       apt:
         deb: https://atom.io/download/deb
         state: present
+      tags: atom
     - name: install atom packages
       shell: >
         apm list --bare | grep -E '^{{ item }}@'
@@ -64,6 +75,7 @@
       register: apm_result
       changed_when: "'Already installed.' not in apm_result.stdout"
       become: no
+      tags: atom
     - name: install git prompt
       become: no
       git:
@@ -151,3 +163,12 @@
         - https://github.com/kchmck/vim-coffee-script.git
         - git://github.com/slim-template/vim-slim.git
       tags: vim
+    - name: download Source Code Pro
+      unarchive:
+        src: https://github.com/adobe-fonts/source-code-pro/archive/master.zip
+        dest: /usr/share/fonts
+        remote_src: yes
+      tags: fonts
+    - name: update font cache
+      command: fc-cache
+      tags: fonts
