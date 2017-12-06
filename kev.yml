@@ -81,11 +81,19 @@
       git:
         repo: https://github.com/magicmonty/bash-git-prompt.git
         dest: ~/.bash-git-prompt
+      tags: git
     - name: set bash prompt
       become: no
       lineinfile:
         path: ~/.bashrc
         line: "source ~/.bash-git-prompt/gitprompt.sh"
+      tags: git
+    - name: configure git name
+      become: no
+      command: git config --get-all user.name "Kevin Hughes"
+    - name: configure git email
+      become: no
+      command: git config --get-all user.email "kevtufc@gmail.com"
     - name: sudo with no password
       lineinfile:
         path: /etc/sudoers
