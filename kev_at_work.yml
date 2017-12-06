@@ -17,6 +17,7 @@
           HostName 192.168.128.208
           User livelink
         marker: "# {mark} My kiosk"
+        create: yes
         state: present
     - name: ll bashrc config
       become: no
@@ -32,11 +33,10 @@
       become: no
       file:
         dest: ~/Code
-      state: directory
+        state: directory
     - name: clone physical-kiosk repo
       become: no
       git:
         repo: git@github.com:livelink/physical-kiosk.git
         dest: ~/Code/physical-kiosk
       ignore_errors: yes
-      state: present

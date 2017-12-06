@@ -42,6 +42,7 @@
       - minimap-split-diff
       - split-diff
       - status-bar-blame
+      - tab-control
   handlers:
     - name: update font cache
       command: fc-cache
@@ -75,7 +76,7 @@
     - name: install atom
       apt:
         deb: https://atom.io/download/deb
-      state: present
+        state: present
       when: not atom_exe.stat.exists
       tags: atom
     - name: install atom packages
@@ -102,10 +103,10 @@
       tags: git
     - name: configure git name
       become: no
-      command: git config --get-all user.name "Kevin Hughes"
+      command: git config --global user.name "Kevin Hughes"
     - name: configure git email
       become: no
-      command: git config --get-all user.email "kevtufc@gmail.com"
+      command: git config --global user.email "kevtufc@gmail.com"
     - name: sudo with no password
       lineinfile:
         path: /etc/sudoers
@@ -195,7 +196,7 @@
       become: no
       file:
         dest: ~/.ssh
-      state: directory
+        state: directory
       tags: ssh
     - name: install ssh public key
       become: no
