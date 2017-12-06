@@ -1,0 +1,22 @@
+[all-kiosks:children]
+my-kiosk
+#test-kiosks
+
+[all-kiosks:vars]
+ansible_user=livelink
+
+[dev-physical-kiosk]
+#Addres of your VM
+#192.168.99.1:3022
+
+# Your main development kiosk
+[my-kiosk]
+kiosk
+#livelink70791.local
+
+
+# Kiosks on the test bench
+[test-kiosks]
+#livelink71286.local
+#livelink70791.local
+#livelink71527.local
