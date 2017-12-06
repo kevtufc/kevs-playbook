@@ -3,12 +3,15 @@
   - localhost
   become: yes
   become_method: sudo
+  vars_prompt:
+    - name: private_key_url
+      prompt: URL of my SSH private key
   vars:
     keys_by_url:
       - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
     keys_by_id:
       - server: hkp://keyserver.ubuntu.com:80
-        id: BBEBDCB318AD50EC6865090613B00F1FD2C19886
+        id: 0DF731E45CE24F27EEEB1450EFDC8610341D9410
     repos:
       - deb http://repository.spotify.com stable non-free
       - deb https://deb.nodesource.com/node_8.x {{ ansible_distribution_release }} main
@@ -39,6 +42,10 @@
       - minimap-split-diff
       - split-diff
       - status-bar-blame
+  handlers:
+    - name: update font cache
+      command: fc-cache
+      tags: fonts
   tasks:
     - name: install keys (by url)
       apt_key:
@@ -61,10 +68,15 @@
         name: "{{ item }}"
         state: present
       with_items: "{{ packages }}"
+    - stat:
+        path: /usr/bin/atom
+      register: atom_exe
+      tags: atom
     - name: install atom
       apt:
         deb: https://atom.io/download/deb
-        state: present
+      state: present
+      when: not atom_exe.stat.exists
       tags: atom
     - name: install atom packages
       shell: >
@@ -148,13 +160,13 @@
       become: no
       file:
         path: ~/.vim/autoload
-        state: directory 
+        state: directory
       tags: pathogen,vim
     - name: make pathogen dir 2
       become: no
       file:
         path: ~/.vim/bundle
-        state: directory 
+        state: directory
       tags: pathogen,vim
     - name: download pathogen
       become: no
@@ -167,7 +179,7 @@
       git:
         repo: "{{ item }}"
         dest: "~/.vim/bundle/{{ item.split(':')[1] | basename | splitext | first }}"
-      with_items: 
+      with_items:
         - https://github.com/kchmck/vim-coffee-script.git
         - git://github.com/slim-template/vim-slim.git
       tags: vim
@@ -176,7 +188,25 @@
         src: https://github.com/adobe-fonts/source-code-pro/archive/master.zip
         dest: /usr/share/fonts
         remote_src: yes
+        creates: /usr/share/fonts/source-code-pro-master
+      notify: update font cache
       tags: fonts
-    - name: update font cache
-      command: fc-cache
-      tags: fonts
+    - name: create ssh config dir
+      become: no
+      file:
+        dest: ~/.ssh
+      state: directory
+      tags: ssh
+    - name: install ssh public key
+      become: no
+      copy:
+        src: id_rsa.pub
+        dest: ~/.ssh/id_rsa.pub
+      tags: ssh
+    - name: install ssh private key
+      become: no
+      get_url:
+        url: "{{ private_key_url }}"
+        dest: ~/.ssh/id_rsa
+        mode: 0400
+      tags: ssh

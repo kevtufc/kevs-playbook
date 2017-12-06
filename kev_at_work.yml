@@ -32,7 +32,7 @@
       become: no
       file:
         dest: ~/Code
-        state: directory
+      state: directory
     - name: clone physical-kiosk repo
       become: no
       git:
