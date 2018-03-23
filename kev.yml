@@ -29,6 +29,8 @@
       - zlib1g-dev
       - libxml2-dev
       - libxslt1-dev
+    gems:
+      - rubocop
     atom_packages:
       - minimap
       - pigments
@@ -70,6 +72,11 @@
         name: "{{ item }}"
         state: present
       with_items: "{{ packages }}"
+    - name: install gems
+      gem:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ gems }}"
     - stat:
         path: /usr/bin/atom
       register: atom_exe
