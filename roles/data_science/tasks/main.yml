@@ -23,3 +23,18 @@
   changed_when: "'Added' in r_result.stdout"
   with_items: "{{ r_packages }}"
   become: no
+- name: download Spark
+  get_url:
+    url: http://apache.mirrors.nublue.co.uk/spark/spark-2.3.2/spark-2.3.2-bin-hadoop2.7.tgz
+    dest: /usr/local/spark-2.3.2-bin-hadoop2.7.tgz
+- name: install Spark
+  unarchive:
+    remote_src: yes
+    src: /usr/local/spark-2.3.2-bin-hadoop2.7.tgz
+    dest: /usr/local/
+- name: add spark bin dir to path
+  become: no
+  lineinfile:
+    path: ~/.bashrc
+    line: export PATH="/usr/local/spark-2.3.2-bin-hadoop2.7/bin:$PATH"
+    state: present

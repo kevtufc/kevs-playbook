@@ -6,5 +6,7 @@ repos:
   - deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/
 packages:
   - r-base
+  - default-jdk
+  - scala
 r_packages:
   - tidyverse
