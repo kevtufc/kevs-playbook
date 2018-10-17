@@ -1,0 +1,176 @@
+---
+- name: install keys (by url)
+  apt_key:
+    url: "{{ item }}"
+    state: present
+  with_items: "{{ keys_by_url }}"
+- name: install keys (by id)
+  apt_key:
+    keyserver: "{{ item.server }}"
+    id: "{{ item.id }}"
+    state: present
+  with_items: "{{ keys_by_id }}"
+- name: set up repos
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items: "{{ repos }}"
+- name: install packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ packages }}"
+- name: install gems
+  gem:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ gems }}"
+- stat:
+    path: /usr/bin/atom
+  register: atom_exe
+  tags: atom
+- name: install atom
+  apt:
+    deb: https://atom.io/download/deb
+    state: present
+  when: not atom_exe.stat.exists
+  tags: atom
+- name: install atom packages
+  shell: >
+    apm list --bare | grep -E '^{{ item }}@'
+    && echo 'Already installed.'
+    || apm install '{{ item }}'
+  with_items: "{{ atom_packages }}"
+  register: apm_result
+  changed_when: "'Already installed.' not in apm_result.stdout"
+  become: no
+  tags: atom
+- name: install git prompt
+  become: no
+  git:
+    repo: https://github.com/magicmonty/bash-git-prompt.git
+    dest: ~/.bash-git-prompt
+  tags: git
+- name: set bash prompt
+  become: no
+  lineinfile:
+    path: ~/.bashrc
+    line: "source ~/.bash-git-prompt/gitprompt.sh"
+  tags: git
+- name: configure git name
+  become: no
+  command: git config --global user.name "Kevin Hughes"
+- name: configure git email
+  become: no
+  command: git config --global user.email "kevtufc@gmail.com"
+- name: configure git upstream settings
+  command: git config --global push.default current
+- name: sudo with no password
+  lineinfile:
+    path: /etc/sudoers
+    regexp: '^%sudo\s'
+    line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+    state: present
+- name: set vim as default editor
+  alternatives:
+    name: editor
+    path: /usr/bin/vim.nox
+  tags: vim
+- name: set vim settings
+  become: no
+  copy:
+    src: vimrc
+    dest: ~/.vimrc
+  tags: pathogen,vim
+- name: install rbenv
+  become: no
+  git:
+    repo: https://github.com/rbenv/rbenv.git
+    dest: ~/.rbenv
+  tags: rbenv
+- name: compile rbenv bash extension
+  become: no
+  command: "src/configure && make -C src"
+  args:
+    chdir: ~/.rbenv
+    creates: ~/.rbenv/src/realpath.o
+  tags: rbenv
+- name: install rbenv build
+  become: no
+  git:
+    repo: https://github.com/rbenv/ruby-build.git
+    dest: ~/.rbenv/plugins/ruby-build
+  tags: rbenv
+- name: local bin dir
+  become: no
+  file:
+    dest: ~/bin
+    state: directory
+- name: put and local bin dir rbenv in bashrc
+  become: no
+  blockinfile:
+    path: ~/.bashrc
+    block: |
+      export PATH="$HOME/bin:$HOME/.rbenv/bin:$PATH"
+      eval "$(rbenv init -)"
+    state: present
+  tags: rbenv
+- name: install aliases
+  copy:
+    src: alias.sh
+    dest: /etc/profile.d/alias.sh
+  tags: alias
+- name: make pathogen dir
+  become: no
+  file:
+    path: ~/.vim/autoload
+    state: directory
+  tags: pathogen,vim
+- name: make pathogen dir 2
+  become: no
+  file:
+    path: ~/.vim/bundle
+    state: directory
+  tags: pathogen,vim
+- name: download pathogen
+  become: no
+  get_url:
+    url: https://raw.githubusercontent.com/tpope/vim-pathogen/master/autoload/pathogen.vim
+    dest: ~/.vim/autoload/pathogen.vim
+  tags: pathogen,vim
+- name: install vim plugins
+  become: no
+  git:
+    repo: "{{ item }}"
+    dest: "~/.vim/bundle/{{ item.split(':')[1] | basename | splitext | first }}"
+  with_items:
+    - https://github.com/kchmck/vim-coffee-script.git
+    - git://github.com/slim-template/vim-slim.git
+  tags: vim
+- name: download Source Code Pro
+  unarchive:
+    src: https://github.com/adobe-fonts/source-code-pro/archive/master.zip
+    dest: /usr/share/fonts
+    remote_src: yes
+    creates: /usr/share/fonts/source-code-pro-master
+  notify: update font cache
+  tags: fonts
+- name: create ssh config dir
+  become: no
+  file:
+    dest: ~/.ssh
+    state: directory
+  tags: ssh
+- name: install ssh public key
+  become: no
+  copy:
+    src: id_rsa.pub
+    dest: ~/.ssh/id_rsa.pub
+  tags: ssh
+- name: install ssh private key
+  become: no
+  get_url:
+    url: "{{ private_key_url }}"
+    dest: ~/.ssh/id_rsa
+    mode: 0400
+  tags: ssh

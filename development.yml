@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  roles:
+    - development
+  become: yes
+  vars_prompt:
+    - name: private_key_url
+      prompt: URL of my SSH private key
