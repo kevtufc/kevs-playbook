@@ -109,6 +109,7 @@
 - name: put and local bin dir rbenv in bashrc
   become: no
   blockinfile:
+    marker: "# {mark} RBENV"
     path: ~/.bashrc
     block: |
       export PATH="$HOME/bin:$HOME/.rbenv/bin:$PATH"
@@ -118,8 +119,9 @@
 - name: install aliases
   copy:
     src: alias.sh
-    dest: /etc/profile.d/alias.sh
+    dest: ~/.bash_aliases
   tags: alias
+  become: no
 - name: make pathogen dir
   become: no
   file:
