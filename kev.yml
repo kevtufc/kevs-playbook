@@ -11,7 +11,7 @@
       - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
     keys_by_id:
       - server: hkp://keyserver.ubuntu.com:80
-        id: 0DF731E45CE24F27EEEB1450EFDC8610341D9410
+        id: 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90 # Spotfy repo key
     repos:
       - deb http://repository.spotify.com stable non-free
       - deb https://deb.nodesource.com/node_8.x {{ ansible_distribution_release }} main
@@ -115,6 +115,8 @@
     - name: configure git email
       become: no
       command: git config --global user.email "kevtufc@gmail.com"
+    - name: configure git upstream settings
+      command: git config --global push.default current
     - name: sudo with no password
       lineinfile:
         path: /etc/sudoers
