@@ -1,0 +1,10 @@
+---
+keys_by_id:
+  - server: keyserver.ubuntu.com
+    id: E298A3A825C0D65DFD57CBB651716619E084DAB9
+repos:
+  - deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/
+packages:
+  - r-base
+r_packages:
+  - tidyverse
