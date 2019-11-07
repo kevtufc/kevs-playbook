@@ -7,7 +7,6 @@ repos:
 packages:
   - vim-nox
   - git
-  - gimp
   - nodejs
   - chromium-browser
   - sshfs
@@ -21,6 +20,8 @@ snaps:
   - name: atom
     classic: true
   - name: spotify
+    classic: false
+  - name: gimp
     classic: false
 atom_packages:
   - minimap
