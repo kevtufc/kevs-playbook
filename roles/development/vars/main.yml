@@ -1,17 +1,13 @@
 ---
 keys_by_url:
   - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
-keys_by_id:
-  - server: hkp://keyserver.ubuntu.com:80
-    id: 931FF8E79F0876134EDDBDCCA87FF9DF48BF1C90 # Spotfy repo key
+keys_by_id: []
 repos:
-  - deb http://repository.spotify.com stable non-free
-  - deb https://deb.nodesource.com/node_8.x {{ ansible_distribution_release }} main
+  - deb https://deb.nodesource.com/node_12.x {{ ansible_distribution_release }} main
 packages:
   - vim-nox
   - git
   - gimp
-  - spotify-client
   - nodejs
   - chromium-browser
   - sshfs
@@ -21,8 +17,11 @@ packages:
   - zlib1g-dev
   - libxml2-dev
   - libxslt1-dev
-gems:
-  - rubocop
+snaps:
+  - name: atom
+    classic: true
+  - name: spotify
+    classic: false
 atom_packages:
   - minimap
   - pigments

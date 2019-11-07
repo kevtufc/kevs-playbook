@@ -20,20 +20,15 @@
     name: "{{ item }}"
     state: present
   with_items: "{{ packages }}"
-- name: install gems
-  gem:
-    name: "{{ item }}"
+- name: install snaps
+  snap:
+    name: "{{ item.name }}"
+    classic: "{{ item.classic }}"
     state: present
-  with_items: "{{ gems }}"
+  with_items: "{{ snaps }}"
 - stat:
     path: /usr/bin/atom
   register: atom_exe
-  tags: atom
-- name: install atom
-  apt:
-    deb: https://atom.io/download/deb
-    state: present
-  when: not atom_exe.stat.exists
   tags: atom
 - name: install atom packages
   shell: >
